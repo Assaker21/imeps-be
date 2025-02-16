@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  firstName  String?
+  fatherName String?
+  lastName   String?
+  email      String?
+  password   String?
+  role       role?   @default(NORMAL)
+
+  fileNumber String?
+  phone      String?
+  branch     String?
+  year       year?
+  ranking    Float?
+  average    Float?
+  notes      String?
+  department department?
+
+  applications application[]
+  documents    document[]
+}
+
+model country {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  name         String?
+  universities university[]
+}
+
+model university {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  name     String?
+  location String?
+  ranking  Int?
+
+  country   country? @relation(fields: [countryId], references: [id])
+  countryId String?
+
+  diplomas diploma[]
+}
+
+model diploma {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  name          String?
+  programType   programType?
+  fees          String?
+  possiblePaths String?      @db.LongText()
+  links         String?      @db.LongText()
+  year          year?
+  department    department?
+
+  interview   Boolean?
+  oralExam    Boolean?
+  writtenExam Boolean?
+
+  appelDate           String?
+  resultsDate         String?
+  applicationDeadline String?
+
+  procedure String? @db.LongText()
+
+  university   university? @relation(fields: [universityId], references: [id])
+  universityId String?
+
+  applications application[]
+  scholarships scholarship[]
+}
+
+model document {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  docType documentType?
+
+  path String?
+
+  user   user?   @relation(fields: [userId], references: [id])
+  userId String?
+}
+
+model application {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  universityId String?
+  diplomaId    String?
+
+  programType programType?
+  status      applicationStatus?
+
+  admitted  Boolean @default(false)
+  nominated Boolean @default(false)
+
+  diploma diploma? @relation(fields: [diplomaId], references: [id])
+
+  applicationScholarships applicationScholarship[]
+  user                    user?                    @relation(fields: [userId], references: [id])
+  userId                  String?
+}
+
+model scholarship {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  name           String?
+  duration       String?
+  conditions     String? @db.LongText()
+  minimumAverage Float?
+  perks          String? @db.LongText()
+
+  diplomas diploma[]
+
+  applications applicationScholarship[]
+}
+
+model applicationScholarship {
+  id        String    @id @default(uuid())
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  applicationId String?
+  scholarshipId String?
+  status        applicationStatus?
+
+  application application? @relation(fields: [applicationId], references: [id])
+  scholarship scholarship? @relation(fields: [scholarshipId], references: [id])
+}
+
+enum applicationStatus {
+  INSCRIT
+  AUTORISE
+  ATTENTE
+  ADMIS
+  REJETE
+}
+
+enum programType {
+  DD
+  M2R
+  EXCHANGE
+  AUTRE
+}
+
+enum documentType {
+  CV
+  MOTIVATION
+  RECOMMENDATION
+  LANGUAGE_TEST
+  OTHER
+}
+
+enum year {
+  FIRST
+  SECOND
+  THIRD
+  FOURTH
+  FIFTH
+}
+
+enum department {
+  ELECTRICAL
+  MECHANICAL
+  PERTOCHEMICAL
+  CIVIL
+}
+
+enum role {
+  ADMIN
+  NORMAL
+}
