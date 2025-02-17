@@ -10,8 +10,11 @@ async function getEntities(entity, query) {
   return (await entity?.get?.formatResult?.(result)) || result;
 }
 
-async function createEntity(entity, data) {
-  const prismaQuery = (await entity?.create?.buildPrismaQuery?.(data)) || {
+async function createEntity(entity, data, user) {
+  const prismaQuery = (await entity?.create?.buildPrismaQuery?.(
+    data,
+    user
+  )) || {
     data,
   };
   const result = await prisma[entity.name].create(prismaQuery);

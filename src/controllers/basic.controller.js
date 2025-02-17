@@ -20,12 +20,15 @@ function getEntities(entity) {
 function createEntity(entity) {
   return async (req, res, next) => {
     try {
-      const result = await basicService.createEntity(entity, {
-        ...req.query,
-        ...req.params,
-        ...req.body,
-        user: req.user,
-      });
+      const result = await basicService.createEntity(
+        entity,
+        {
+          ...req.query,
+          ...req.params,
+          ...req.body,
+        },
+        req.user
+      );
 
       res.send(result);
     } catch (err) {

@@ -141,10 +141,23 @@ export default [
       },
     },
     create: {
-      buildPrismaQuery: (query, data) => {
-        if (query.user.role == "NORMAL") {
-          return { data: { ...data, userId: query.user.id } };
-        } else return data;
+      buildPrismaQuery: (data, user) => {
+        if (user.role == "NORMAL") {
+          delete data.userId;
+          const diplomaId = "" + data.diplomaId;
+          delete data.diplomaId;
+          return {
+            data: {
+              ...data,
+              user: {
+                connect: { id: user.id },
+              },
+              diploma: {
+                connect: { id: diplomaId },
+              },
+            },
+          };
+        } else return { data };
       },
     },
     update: {
